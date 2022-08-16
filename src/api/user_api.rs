@@ -1,6 +1,7 @@
 use crate::{models::user_model::User, repository::mongodb_repo::MongoRepo};
 use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
 use rocket::{http::Status, serde::json::Json, State};
+use crate::api::utils::response::build_response;
 
 #[post("/user", data = "<new_user>")]
 pub fn create_user(
@@ -13,9 +14,17 @@ pub fn create_user(
         location: new_user.location.to_owned(),
         title: new_user.title.to_owned(),
     };
+
+
+
     let user_detail = db.create_user(data);
     match user_detail {
-        Ok(user) => Ok(Json(user)),
+        Ok(user) => {
+
+            let res = build_response(true, , None);
+            println!("{:?}", res);
+            Ok(Json(user))
+        },
         Err(_) => Err(Status::InternalServerError),
     }
 }
@@ -52,14 +61,14 @@ pub fn update_user(
     let update_result = db.update_user(&id, data);
     match update_result {
         Ok(update) => {
-            if update.matched_count == 1 {
+            return if update.matched_count == 1 {
                 let updated_user_info = db.get_user(&id);
-                return match updated_user_info {
+                match updated_user_info {
                     Ok(user) => Ok(Json(user)),
                     Err(_) => Err(Status::InternalServerError),
-                };
+                }
             } else {
-                return Err(Status::NotFound);
+                Err(Status::NotFound)
             }
         }
         Err(_) => Err(Status::InternalServerError),
