@@ -1,13 +1,16 @@
+use std::ptr::null;
 use crate::{models::user_model::User, repository::mongodb_repo::MongoRepo};
-use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
+use mongodb::{bson::oid::ObjectId};
 use rocket::{http::Status, serde::json::Json, State};
-use crate::api::utils::response::build_response;
+use rocket::serde::json::serde_json::json;
+use crate::api::utils::response::{ApiResponse, build_response};
+extern crate serde;
 
 #[post("/user", data = "<new_user>")]
 pub fn create_user(
     db: &State<MongoRepo>,
     new_user: Json<User>,
-) -> Result<Json<InsertOneResult>, Status> {
+) -> Result<Json<ApiResponse>, Status> {
     let data = User {
         id: None,
         name: new_user.name.to_owned(),
@@ -15,17 +18,15 @@ pub fn create_user(
         title: new_user.title.to_owned(),
     };
 
-
-
     let user_detail = db.create_user(data);
     match user_detail {
         Ok(user) => {
-
-            let res = build_response(true, , None);
-            println!("{:?}", res);
-            Ok(Json(user))
+            let payload = json!({"id": user.inserted_id});
+            Ok(Json(build_response(true, payload, None)))
         },
-        Err(_) => Err(Status::InternalServerError),
+        Err(err) => {
+            Ok(Json(build_response(false, json!({}), Option::from(err.to_string()))))
+        },
     }
 }
 

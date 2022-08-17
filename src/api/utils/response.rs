@@ -1,10 +1,11 @@
 use serde::{Serialize, Deserialize};
 // use rocket::{serde::json::Json};
+use rocket::serde::json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse {
     pub success: bool,
-    pub payload: Option<String>,
+    pub payload: Value,
     pub error: Option<String>
 }
 
@@ -14,7 +15,7 @@ impl ApiResponse {
     // }
 }
 
-pub fn build_response(success: bool, payload: Option<String>, error: Option<String>) -> ApiResponse {
+pub fn build_response(success: bool, payload: Value, error: Option<String>) -> ApiResponse {
     ApiResponse {
         success,
         payload,
