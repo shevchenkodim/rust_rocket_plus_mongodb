@@ -5,6 +5,7 @@ use std::fmt::format;
 use std::path::{Path, PathBuf};
 use rocket::fs::{NamedFile, TempFile};
 use rocket::http::ContentType;
+use rocket::Request;
 use crate::api::custom_from_request::user_agent_from_request::UserAgent;
 
 #[get("/")]
@@ -38,4 +39,9 @@ pub async fn file_upload_view(mut file: TempFile<'_>) -> std::io::Result<()> {
     let f_name = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
     file.persist_to(String::from(format!("tmp/{}.{}", f_name, f_ext))).await?;
     Ok(())
+}
+
+#[catch(404)]
+pub async fn not_found(req: &Request) -> String {
+    format!("Sorry, '{}' is not a valid path.", req.uri())
 }
