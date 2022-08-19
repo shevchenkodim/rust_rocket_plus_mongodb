@@ -1,8 +1,10 @@
 // Methods
 // #[any_method_name("/")] -> get, put, post, delete, head, patch, options
-
+use std::time::{SystemTime, UNIX_EPOCH};
+use std::fmt::format;
 use std::path::{Path, PathBuf};
-use rocket::fs::NamedFile;
+use rocket::fs::{NamedFile, TempFile};
+use rocket::http::ContentType;
 use crate::api::custom_from_request::user_agent_from_request::UserAgent;
 
 #[get("/")]
@@ -27,4 +29,13 @@ pub async fn hello_view(name: &str, age: u8, cool: bool) -> String {
 #[get("/templates/<file..>")]
 pub async fn template_file_view(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("templates/").join(file)).await.ok()
+}
+
+#[post("/file/upload", data = "<file>")]
+pub async fn file_upload_view(mut file: TempFile<'_>) -> std::io::Result<()> {
+    let content_type = file.content_type().unwrap().to_string();
+    let f_ext = content_type.split("/").last().unwrap().to_string();
+    let f_name = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+    file.persist_to(String::from(format!("tmp/{}.{}", f_name, f_ext))).await?;
+    Ok(())
 }
