@@ -14,7 +14,7 @@ struct CreditCard {
 }
 
 fn luhn<'v>(number: &u64, cvv: u16, exp: &Date) -> form::Result<'v, ()> {
-    if !valid {
+    if !cvv > 999 {
         Err(Error::validation("invalid credit card number"))?;
     }
     Ok(())

@@ -42,6 +42,6 @@ pub async fn file_upload_view(mut file: TempFile<'_>) -> std::io::Result<()> {
 }
 
 #[catch(404)]
-pub async fn not_found(req: &Request) -> String {
+pub async fn not_found(req: &Request<'_>) -> String {
     format!("Sorry, '{}' is not a valid path.", req.uri())
 }

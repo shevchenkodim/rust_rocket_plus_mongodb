@@ -13,6 +13,7 @@ use api::user_api::{create_user, get_user, update_user, delete_user, get_all_use
 use api::example_simple_api::{index_view, hello_view, template_file_view, user_agent_view,
                               file_upload_view, not_found};
 use api::example_products_api::{new_product_view, get_product_view};
+use api::example_response_api::{get_response_1, get_response_2};
 use repository::mongodb_repo::MongoRepo;
 
 
@@ -37,6 +38,9 @@ async fn main() -> Result<(), rocket::Error> {
         .mount("/", routes![new_product_view])
         .mount("/", routes![get_product_view])
 
+        .mount("/", routes![get_response_1])
+        .mount("/", routes![get_response_2])
+
         // CRUD[mongodb + users]
         .mount("/", routes![create_user])
         .mount("/", routes![get_user])
@@ -48,7 +52,8 @@ async fn main() -> Result<(), rocket::Error> {
         .mount("/static", FileServer::from("static/"))
 
         // System
-        .mount("/", routes![not_found])
+        .register("/", catchers![not_found])
+
         .launch()
         .await?;
 

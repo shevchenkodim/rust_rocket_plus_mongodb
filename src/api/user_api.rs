@@ -10,7 +10,7 @@ extern crate serde;
 pub fn create_user(
     db: &State<MongoRepo>,
     new_user: Json<User>,
-) -> Result<Json<ApiResponse>, Status> {
+) -> ApiResponse {
     let data = User {
         id: None,
         name: new_user.name.to_owned(),
@@ -22,10 +22,10 @@ pub fn create_user(
     match user_detail {
         Ok(user) => {
             let user_info = serde_json::to_value(&user).unwrap();
-            Ok(Json(build_response(true, json!({"id": user_info["insertedId"]["$oid"]}), None)))
+            build_response(true, Some(json!({"id": user_info["insertedId"]["$oid"]})), None)
         },
         Err(err) => {
-            Ok(Json(build_response(false, json!(null), Option::from(err.to_string()))))
+            build_response(false, None, Option::from(err.to_string()))
         },
     }
 }
