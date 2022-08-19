@@ -1,7 +1,7 @@
-use std::ptr::null;
 use crate::{models::user_model::User, repository::mongodb_repo::MongoRepo};
 use mongodb::{bson::oid::ObjectId};
 use rocket::{http::Status, serde::json::Json, State};
+use rocket::serde::json::serde_json;
 use rocket::serde::json::serde_json::json;
 use crate::api::utils::response::{ApiResponse, build_response};
 extern crate serde;
@@ -21,11 +21,11 @@ pub fn create_user(
     let user_detail = db.create_user(data);
     match user_detail {
         Ok(user) => {
-            let payload = json!({"id": user.inserted_id});
-            Ok(Json(build_response(true, payload, None)))
+            let user_info = serde_json::to_value(&user).unwrap();
+            Ok(Json(build_response(true, json!({"id": user_info["insertedId"]["$oid"]}), None)))
         },
         Err(err) => {
-            Ok(Json(build_response(false, json!({}), Option::from(err.to_string()))))
+            Ok(Json(build_response(false, json!(null), Option::from(err.to_string()))))
         },
     }
 }
