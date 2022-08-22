@@ -1,10 +1,10 @@
 // Methods
 // #[any_method_name("/")] -> get, put, post, delete, head, patch, options
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::fmt::format;
+// use std::fmt::format;
 use std::path::{Path, PathBuf};
 use rocket::fs::{NamedFile, TempFile};
-use rocket::http::ContentType;
+// use rocket::http::ContentType;
 use rocket::Request;
 use crate::api::custom_from_request::user_agent_from_request::UserAgent;
 

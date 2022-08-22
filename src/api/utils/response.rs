@@ -1,6 +1,5 @@
-use std::io::repeat;
 use serde::{Serialize, Deserialize};
-use rocket::serde::json::{Json, serde_json, Value};
+use rocket::serde::json::{serde_json, Value};
 use rocket::request::Request;
 use rocket::response::{self, Response, Responder};
 use rocket::http::{ContentType, Status};
@@ -20,7 +19,7 @@ impl<'r> Responder<'r, 'static> for ApiResponse {
             status_code = Status::BadRequest;
         }
 
-        let mut serialized = serde_json::to_string(&self).unwrap();
+        let serialized = serde_json::to_string(&self).unwrap();
         Response::build_from(serialized.respond_to(req)?)
             .header(ContentType::new("application", "json"))
             .status(status_code)
